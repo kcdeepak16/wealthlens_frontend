@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 4% 6%;
+    --foreground: 220 14% 90%;
+    --card: 240 4% 11%;
+    --card-foreground: 220 14% 90%;
+    --popover: 240 4% 11%;
+    --popover-foreground: 220 14% 90%;
+    --primary: 243 100% 70%;
+    --primary-foreground: 240 4% 6%;
+    --secondary: 240 4% 14%;
+    --secondary-foreground: 220 14% 90%;
+    --muted: 240 4% 14%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 243 100% 70%;
+    --accent-foreground: 240 4% 6%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 220 14% 90%;
+    --border: 226 8% 23%;
+    --input: 226 8% 23%;
+    --ring: 243 100% 70%;
+    --chart-1: 243 100% 70%;
+    --chart-2: 142 69% 56%;
+    --chart-3: 0 72% 51%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 197 71% 52%;
+    --radius: 0.5rem;
+    --sidebar-background: 240 4% 11%;
+    --sidebar-foreground: 220 14% 90%;
+    --sidebar-primary: 243 100% 70%;
+    --sidebar-primary-foreground: 240 4% 6%;
+    --sidebar-accent: 240 4% 14%;
+    --sidebar-accent-foreground: 220 14% 90%;
+    --sidebar-border: 226 8% 23%;
+    --sidebar-ring: 243 100% 70%;
+    /* WealthLens custom tokens */
+    --wl-bg: #0e0e10;
+    --wl-surface: #1b1c1f;
+    --wl-surface-hover: #21222a;
+    --wl-border: #3a3d44;
+    --wl-text: #e4e6ea;
+    --wl-muted: #9ca3af;
+    --wl-accent: #6c63ff;
+    --wl-gain: #22c55e;
+    --wl-loss: #ef4444;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-[#0e0e10] text-[#e4e6ea];
+    font-family: 'Work Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+  .font-mono, [class*="font-mono"] {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  /* Hide scrollbar but keep scroll */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+@layer utilities {
+  .pill {
+    @apply px-3 py-1.5 rounded-full border border-[#3a3d44] text-xs font-mono transition-colors cursor-pointer select-none;
+    color: #9ca3af;
+  }
+  .pill-active {
+    @apply bg-[#e4e6ea] text-[#0e0e10] border-[#e4e6ea];
+  }
+  .wl-card {
+    @apply bg-[#1b1c1f] border border-[#3a3d44] rounded-xl;
+  }
+  .wl-divider {
+    @apply border-t border-[#3a3d44];
+  }
+}
