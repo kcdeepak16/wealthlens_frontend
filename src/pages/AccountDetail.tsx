@@ -102,7 +102,7 @@ export default function AccountDetail() {
     </div></DrawerContent></Drawer>
     <AccountFormSheet open={edit} onClose={() => setEdit(false)} account={account} pending={update.isPending} onSave={(data) => update.mutate({ id, data }, { onSuccess: () => { setEdit(false); toast.success("Account updated"); } })} />
     <IndividualEntrySheet open={addEntry} onClose={() => setAddEntry(false)} account={account} pending={createEntry.isPending} onSave={(data) => createEntry.mutate(data, { onSuccess: () => { setAddEntry(false); toast.success("Entry saved"); }, onError: () => toast.error("Could not save entry") })} />
-    <IndividualEntrySheet open={!!editEntry} entry={editEntry ?? undefined} onClose={() => setEditEntry(null)} account={account} pending={updateEntry.isLoading} onSave={(data) => {
+    <IndividualEntrySheet open={!!editEntry} entry={editEntry ?? undefined} onClose={() => setEditEntry(null)} account={account} pending={updateEntry.isPending} onSave={(data) => {
       if (!editEntry) return;
       updateEntry.mutate({ entryId: editEntry.id, data }, { onSuccess: () => { setEditEntry(null); toast.success("Entry updated"); }, onError: () => toast.error("Could not update entry") });
     }} />

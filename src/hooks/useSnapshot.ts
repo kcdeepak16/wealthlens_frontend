@@ -38,7 +38,7 @@ export function useClearAllData() {
 
 export function useUpdateEntry(accountId: number) {
   const client = useQueryClient();
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: ({ entryId, data }: { entryId: number; data: any }) => updateEntry(entryId, data),
     onSuccess: () => {
       invalidateAll(client);
@@ -46,4 +46,6 @@ export function useUpdateEntry(accountId: number) {
       client.invalidateQueries({ queryKey: ["account-chart", accountId] });
     },
   });
+  // expose isPending for consistency with existing codebase
+  return Object.assign(mutation, { isPending: (mutation as any).isLoading });
 }
