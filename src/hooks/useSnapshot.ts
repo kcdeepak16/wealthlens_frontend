@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createIndividualEntry } from "@/api/accounts";
-import { clearAllData, createSnapshot, deleteEntry } from "@/api/entries";
+import { clearAllData, createSnapshot, deleteEntry, updateEntry } from "@/api/entries";
 import type { IndividualEntryCreate, SnapshotCreate } from "@/types";
 
 function invalidateAll(client: ReturnType<typeof useQueryClient>) {
@@ -34,4 +34,16 @@ export function useDeleteEntry(accountId: number) {
 export function useClearAllData() {
   const client = useQueryClient();
   return useMutation({ mutationFn: clearAllData, onSuccess: () => client.invalidateQueries() });
+}
+
+export function useUpdateEntry(accountId: number) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ entryId, data }: { entryId: number; data: any }) => updateEntry(entryId, data),
+    onSuccess: () => {
+      invalidateAll(client);
+      client.invalidateQueries({ queryKey: ["account-entries", accountId] });
+      client.invalidateQueries({ queryKey: ["account-chart", accountId] });
+    },
+  });
 }

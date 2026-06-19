@@ -15,7 +15,7 @@ import MetricToggle from "@/components/MetricToggle";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { useAccount, useAccountChartData, useAccountEntries, useDeleteAccount, useUpdateAccount } from "@/hooks/useAccounts";
-import { useCreateIndividualEntry, useDeleteEntry } from "@/hooks/useSnapshot";
+import { useCreateIndividualEntry, useDeleteEntry, useUpdateEntry } from "@/hooks/useSnapshot";
 import { formatDate, formatDelta, formatINR, formatShortDate } from "@/lib/format";
 import { ACCOUNT_TYPE_LABELS, type TimeRange } from "@/types";
 
@@ -32,10 +32,12 @@ export default function AccountDetail() {
   const removeAccount = useDeleteAccount();
   const removeEntry = useDeleteEntry(id);
   const createEntry = useCreateIndividualEntry(id);
+  const updateEntry = useUpdateEntry(id);
   const [active, setActive] = useState(new Set(["value"]));
   const [menu, setMenu] = useState(false);
   const [edit, setEdit] = useState(false);
   const [addEntry, setAddEntry] = useState(false);
+  const [editEntry, setEditEntry] = useState<null | any>(null);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<number | null>(null);
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -86,6 +88,7 @@ export default function AccountDetail() {
 
     <div className="mb-2 flex items-center justify-between"><p className="text-[10px] font-mono uppercase tracking-widest text-[#9ca3af]">Entry Log</p>{!account.consider_for_networth && <button onClick={() => setAddEntry(true)} className="flex min-h-[44px] items-center gap-1 text-xs font-medium text-[#6c63ff]"><Plus size={14} />Add Entry</button>}</div>
     {(entriesQuery.data?.length ?? 0) ? <section className="wl-card mb-4 overflow-hidden">{entriesQuery.data!.map((entry, index, list) => <div key={entry.id}
+      onClick={() => setEditEntry(entry)}
       onPointerDown={() => { pressTimer.current = setTimeout(() => setEntryToDelete(entry.id), 650); }} onPointerUp={() => pressTimer.current && clearTimeout(pressTimer.current)} onPointerLeave={() => pressTimer.current && clearTimeout(pressTimer.current)}
       className={`flex min-h-[64px] items-center gap-3 px-3 ${index < list.length - 1 ? "border-b border-[#3a3d44]" : ""}`}>
       <div className="min-w-0 flex-1"><p className="text-xs font-mono text-[#9ca3af]">{formatDate(entry.date_of_entry)}</p><div className="mt-1 flex flex-wrap gap-2">{entry.metric_entries.map((value) => {
@@ -99,6 +102,10 @@ export default function AccountDetail() {
     </div></DrawerContent></Drawer>
     <AccountFormSheet open={edit} onClose={() => setEdit(false)} account={account} pending={update.isPending} onSave={(data) => update.mutate({ id, data }, { onSuccess: () => { setEdit(false); toast.success("Account updated"); } })} />
     <IndividualEntrySheet open={addEntry} onClose={() => setAddEntry(false)} account={account} pending={createEntry.isPending} onSave={(data) => createEntry.mutate(data, { onSuccess: () => { setAddEntry(false); toast.success("Entry saved"); }, onError: () => toast.error("Could not save entry") })} />
+    <IndividualEntrySheet open={!!editEntry} entry={editEntry ?? undefined} onClose={() => setEditEntry(null)} account={account} pending={updateEntry.isLoading} onSave={(data) => {
+      if (!editEntry) return;
+      updateEntry.mutate({ entryId: editEntry.id, data }, { onSuccess: () => { setEditEntry(null); toast.success("Entry updated"); }, onError: () => toast.error("Could not update entry") });
+    }} />
     <ConfirmSheet isOpen={entryToDelete !== null} onClose={() => setEntryToDelete(null)} title="Delete this entry?" description="This cannot be undone." confirmLabel="Delete Entry" destructive onConfirm={() => entryToDelete && removeEntry.mutate(entryToDelete, { onSuccess: () => { setEntryToDelete(null); toast.success("Entry deleted"); } })} />
     <ConfirmSheet isOpen={deleteAccountOpen} onClose={() => setDeleteAccountOpen(false)} title="Delete this account?" description="This will permanently delete all entries for this account." confirmLabel="Delete Account" destructive onConfirm={() => removeAccount.mutate(id, { onSuccess: () => navigate("/accounts") })} />
   </Page>;

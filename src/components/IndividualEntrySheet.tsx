@@ -2,18 +2,32 @@ import { useEffect, useState } from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import DatePicker from "./DatePicker";
 import { toISODate } from "@/lib/format";
-import type { AccountWithStats, IndividualEntryCreate } from "@/types";
+import type { AccountWithStats, IndividualEntryCreate, AccountEntryOut } from "@/types";
 
-export default function IndividualEntrySheet({ open, onClose, account, onSave, pending = false }: {
-  open: boolean; onClose: () => void; account: AccountWithStats; onSave: (data: IndividualEntryCreate) => void; pending?: boolean;
+export default function IndividualEntrySheet({ open, onClose, account, entry, onSave, pending = false }: {
+  open: boolean; onClose: () => void; account: AccountWithStats; entry?: AccountEntryOut; onSave: (data: IndividualEntryCreate) => void; pending?: boolean;
 }) {
   const [date, setDate] = useState(toISODate(new Date()));
   const [value, setValue] = useState("");
   const [metrics, setMetrics] = useState<Record<number, string>>({});
-  useEffect(() => { if (open) { setDate(toISODate(new Date())); setValue(""); setMetrics({}); } }, [open]);
+  useEffect(() => {
+    if (open) {
+      if (entry) {
+        setDate(entry.date_of_entry);
+        setValue(String(entry.current_value));
+        const map: Record<number, string> = {};
+        entry.metric_entries.forEach((m) => { map[m.metric_id] = String(m.value); });
+        setMetrics(map);
+      } else {
+        setDate(toISODate(new Date()));
+        setValue("");
+        setMetrics({});
+      }
+    }
+  }, [open, entry]);
   return <Drawer open={open} onOpenChange={(next) => !next && onClose()}>
     <DrawerContent className="max-w-xl mx-auto max-h-[90vh] overflow-y-auto bg-[#1b1c1f] border-[#3a3d44]">
-      <DrawerHeader className="text-left"><DrawerTitle className="text-[#e4e6ea]">Add Entry</DrawerTitle></DrawerHeader>
+      <DrawerHeader className="text-left"><DrawerTitle className="text-[#e4e6ea]">{entry ? "Edit Entry" : "Add Entry"}</DrawerTitle></DrawerHeader>
       <div className="space-y-4 px-4 pb-6">
         <DatePicker value={date} onChange={setDate} />
         <label className="block text-[10px] font-mono uppercase tracking-widest text-[#9ca3af]">Current Value
